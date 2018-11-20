@@ -16,12 +16,12 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"os"
 
-	"github.com/spf13/cobra"
 	"github.com/go-chassis/go-chassis"
 	"github.com/go-chassis/go-chassis/pkg/util/fileutil"
-	"github.com/go-chassis/go-chassis/core/lager"
+	"github.com/spf13/cobra"
 )
 
 var cfgFile string
@@ -54,7 +54,7 @@ to quickly create a Cobra application.`,
 
 			fmt.Println(os.Getenv(fileutil.ChassisConfDir))
 			if err := chassis.Init(); err != nil {
-				lager.Logger.Error("Init failed.", err)
+				logrus.Error("Init failed.", err)
 				return err
 			}
 

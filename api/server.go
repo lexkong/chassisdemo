@@ -5,6 +5,7 @@ import (
 	"github.com/go-chassis/go-chassis/core/lager"
 	"github.com/go-chassis/go-chassis/client/rest"
 	"github.com/go-chassis/go-chassis/core"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"github.com/go-chassis/go-chassis"
 	"github.com/tomlee0201/chassisdemo/protobuf"
@@ -16,24 +17,23 @@ type RestFulApi struct {}
 func (r *RestFulApi) SayRestHello(b *restful.Context) {
 	lager.Logger.Infof("Request:%s", b.ReadPathParameter("userid"))
 
-	req, _ := rest.NewRequest("GET", "cse://RestServer/server/" + b.ReadPathParameter("userid"))
-	defer req.Close()
+	req, _ := rest.NewRequest("GET", "cse://RestServer/server/" + b.ReadPathParameter("userid"), nil)
+
 	resp, err := core.NewRestInvoker().ContextDo(context.TODO(), req)
 	if err != nil {
 		b.WriteHeader(http.StatusServiceUnavailable)
 		b.Write([]byte("Server internal error"))
-
-		lager.Logger.Error("error", err)
+		logrus.Error(err)
 		return
 	}
-	defer resp.Close()
-	responseBody := resp.ReadBody()
-	lager.Logger.Info(string(responseBody))
 
-	if resp.GetStatusCode() != 200 {
-		b.WriteHeader(resp.GetStatusCode())
+	if resp.StatusCode != 200 {
+		b.WriteHeader(resp.StatusCode)
 		b.Write([]byte("Server internal error"))
 	} else {
+		var responseBody []byte = make([]byte, resp.ContentLength)
+		resp.Body.Read(responseBody)
+		logrus.Info(string(responseBody))
 		b.Write(responseBody)
 	}
 }
@@ -46,7 +46,7 @@ func (r *RestFulApi) SayRPCHello(b *restful.Context) {
 	reply := &protobuf.HelloReply{}
 	//Invoke with microservice name, schema ID and operation ID
 	if err := core.NewRPCInvoker().Invoke(context.Background(), "RpcServer", "HelloService", "SayHello", &protobuf.HelloRequest{Name: b.ReadPathParameter("userid")}, reply); err != nil {
-		lager.Logger.Error("error", err)
+		logrus.Error("error", err)
 		b.WriteHeader(http.StatusInternalServerError)
 		b.Write([]byte("Server internal error"))
 	} else {

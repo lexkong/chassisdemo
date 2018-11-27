@@ -1,9 +1,10 @@
-package rpcserver
+package grpcserver
 
 import (
 	"context"
 	"github.com/go-chassis/go-chassis"
 	"github.com/go-chassis/go-chassis/core/server"
+	_ "github.com/go-chassis/go-chassis/server/grpc"
 	"github.com/tomlee0201/chassisdemo/protobuf"
 )
 
@@ -15,5 +16,5 @@ func (s *HelloServer) SayHello(ctx context.Context, in *protobuf.HelloRequest) (
 }
 
 func Run()  {
-	chassis.RegisterSchema("highway", &HelloServer{}, server.WithSchemaID("HelloService"))
+	chassis.RegisterSchema("grpc", &HelloServer{}, server.WithGRPCServiceDesc(&protobuf.Greeter_serviceDesc))
 }

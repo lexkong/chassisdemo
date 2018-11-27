@@ -3,8 +3,8 @@ cse:
     registry:
       address: http://127.0.0.1:30100
   protocols: # what kind of server you want to launch
-    highway:
-      listenAddress: 127.0.0.1:5002
+    grpc:
+      listenAddress: 127.0.0.1:5003
   handler:
     chain:
       Provider:

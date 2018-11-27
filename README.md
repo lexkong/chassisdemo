@@ -4,11 +4,22 @@ go-chassis demo
 # 微服务列表
 * API： 服务对外接口
 * RestServer： Rest服务
-* RpcServer： RPC服务
+* GRpcServer： GRPC服务
+
+# 生成协议文件
+```
+go generate protobuf/helloworld.go
+```
+
+# 修改生成的```helloworld.pb.go```
+变量```_Greeter_serviceDesc```修改为```Greeter_serviceDesc```
+
+# 编译
+```go build```
 
 # 运行
 ```$xslt
-heavyrains-MacBook-Pro:chassisdemo heavyrainlee$ ./chassisdemo 
+heavyrains-MacBook-Pro:chassisdemo heavyrainlee$ ./chassisdemo
 A longer description that spans multiple lines and likely contains
 examples and usage of using your application. For example:
 
@@ -23,7 +34,7 @@ Available Commands:
   api         A brief description of your command
   help        Help about any command
   restserver  A brief description of your command
-  rpcserver   A brief description of your command
+  grpcserver   A brief description of your command
 
 Flags:
   -c, --config string   config file path (default is ./${command}/conf/)
@@ -46,9 +57,9 @@ heavyrains-MacBook-Pro:chassisdemo heavyrainlee$ ./chassisdemo restserver
 ```
 > 可以运行多个，运行多个时，可执行文件和config文件需要放到不同的目录，然后修改端口号
 
-### 运行RPC服务
+### 运行GRPC服务
 ```$xslt
-heavyrains-MacBook-Pro:chassisdemo heavyrainlee$ ./chassisdemo rpcserver
+heavyrains-MacBook-Pro:chassisdemo heavyrainlee$ ./chassisdemo grpcserver
 ```
 > 可以运行多个，运行多个时，可执行文件和config文件需要放到不同的目录，然后修改端口号
 
@@ -56,5 +67,5 @@ heavyrains-MacBook-Pro:chassisdemo heavyrainlee$ ./chassisdemo rpcserver
 当所有服务都成功启动后，执行下面两个命令检查结果
 ```$xslt
 curl localhost:5000/sayresthello/heavyrain
-curl localhost:5000/sayrpchello/heavyrain
+curl localhost:5000/saygrpchello/heavyrain
 ```

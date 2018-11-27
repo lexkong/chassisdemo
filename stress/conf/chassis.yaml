@@ -1,0 +1,16 @@
+cse:
+  service:
+    registry:
+      type: servicecenter
+      scope: full
+      address: http://127.0.0.1:30100
+      refreshInterval : 30s
+      watch: true
+  handler:
+    chain:
+      Consumer:
+        default: bizkeeper-consumer,loadbalance, ratelimiter-consumer,transport
+tracing:
+  enabled: true
+  collectorType: zipkin
+  collectorTarget: http://localhost:9411/api/v1/spans

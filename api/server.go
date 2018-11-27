@@ -6,6 +6,7 @@ import (
 	"github.com/go-chassis/go-chassis/client/rest"
 	"github.com/go-chassis/go-chassis/core"
 	"github.com/sirupsen/logrus"
+	_ "github.com/go-chassis/go-chassis/client/grpc"
 	"net/http"
 	"github.com/go-chassis/go-chassis"
 	"github.com/tomlee0201/chassisdemo/protobuf"
@@ -38,27 +39,27 @@ func (r *RestFulApi) SayRestHello(b *restful.Context) {
 	}
 }
 
-
-func (r *RestFulApi) SayRPCHello(b *restful.Context) {
+func (r *RestFulApi) SayGRPCHello(b *restful.Context) {
 	lager.Logger.Infof("Request:%s", b.ReadPathParameter("userid"))
 
 	//declare reply struct
 	reply := &protobuf.HelloReply{}
 	//Invoke with microservice name, schema ID and operation ID
-	if err := core.NewRPCInvoker().Invoke(context.Background(), "RpcServer", "HelloService", "SayHello", &protobuf.HelloRequest{Name: b.ReadPathParameter("userid")}, reply); err != nil {
-		logrus.Error("error", err)
+	if err := core.NewRPCInvoker().Invoke(context.Background(), "GRpcServer", "helloworld.Greeter", "SayHello",
+		&protobuf.HelloRequest{Name: b.ReadPathParameter("userid")}, reply, core.WithProtocol("grpc")); err != nil {
+		logrus.Error("error" + err.Error())
 		b.WriteHeader(http.StatusInternalServerError)
 		b.Write([]byte("Server internal error"))
 	} else {
+		logrus.Info(reply.Message)
 		b.Write([]byte(reply.Message))
 	}
 }
 
-
 func (s *RestFulApi) URLPatterns() []restful.Route {
 	return []restful.Route{
 		{http.MethodGet, "/sayresthello/{userid}", "SayRestHello"},
-		{http.MethodGet, "/sayrpchello/{userid}", "SayRPCHello"},
+		{http.MethodGet, "/saygrpchello/{userid}", "SayGRPCHello"},
 	}
 }
 

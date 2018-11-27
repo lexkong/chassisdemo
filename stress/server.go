@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/tomlee0201/chassisdemo/protobuf"
 	"strconv"
+	"sync/atomic"
 	"time"
 )
 
@@ -50,16 +51,22 @@ func Run() {
 		time.Sleep(1 * time.Second)
 
 		startT := time.Now()
-		success := 0
-		failure := 0
+		var success int32 = 0
+		var failure int32 = 0
 		for i := 0; i < 100000 ; i++  {
-			if SayGRPCHello(i) {
-				success++
-			} else {
-				failure++
-			}
-			//time.Sleep(100 * time.Microsecond)
+			go func() {
+				if SayGRPCHello(i) {
+					atomic.AddInt32(&success, 1)
+				} else {
+					atomic.AddInt32(&failure, 1)
+				}
+			}()
+			time.Sleep(50 * time.Microsecond)
 		}
+		for success + failure != 100000 {
+			 time.Sleep(1 * time.Second)
+		}
+
 		fmt.Println("success %d, failure%d", success, failure)
 		endT := time.Now()
 		usedT := endT.Unix() - startT.Unix()

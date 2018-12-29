@@ -69,3 +69,10 @@ heavyrains-MacBook-Pro:chassisdemo heavyrainlee$ ./chassisdemo grpcserver
 curl localhost:5000/sayresthello/heavyrain
 curl localhost:5000/saygrpchello/heavyrain
 ```
+
+# 压力测试
+当所有服务都成功启动后，执行下面两个命令进行性能验证
+```$xslt
+heavyrains-MacBook-Pro:chassisdemo heavyrainlee$ ./chassisdemo stress 0
+```
+> 0对grpc服务进行压力测试，1 对http服务压力测试。测试时使用100个协程，每个做1000次rpc，每次rpc休眠25ms

@@ -8,6 +8,7 @@ import (
 	"github.com/go-chassis/go-chassis/core"
 	"github.com/sirupsen/logrus"
 	"github.com/tomlee0201/chassisdemo/protobuf"
+	"net/http"
 	"strconv"
 	"sync/atomic"
 	"time"
@@ -28,7 +29,6 @@ func SayRestHello(i int) bool {
 	} else {
 		var responseBody []byte = make([]byte, resp.ContentLength)
 		resp.Body.Read(responseBody)
-		logrus.Info(string(responseBody))
 		return true;
 	}
 }
@@ -46,25 +46,36 @@ func SayGRPCHello(i int) bool {
 	}
 }
 
-func Run() {
+
+func Run(args []string) {
 	go func() {
 		time.Sleep(1 * time.Second)
 
 		startT := time.Now()
 		var success int32 = 0
 		var failure int32 = 0
-		for i := 0; i < 100000 ; i++  {
+		nthread := 100
+		ncount := 1000
+		for i := 0; i < nthread ; i++  {
 			go func() {
-				if SayGRPCHello(i) {
-					atomic.AddInt32(&success, 1)
-				} else {
-					atomic.AddInt32(&failure, 1)
+				for j := 0; j < ncount; j++ {
+					var result bool
+					if len(args) == 0 || args[0] == "0" {
+						result = SayGRPCHello(i)
+					} else {
+						result = SayRestHello(i)
+					}
+					if result {
+						atomic.AddInt32(&success, 1)
+					} else {
+						atomic.AddInt32(&failure, 1)
+					}
+					time.Sleep(25 * time.Millisecond)
 				}
 			}()
-			time.Sleep(50 * time.Microsecond)
 		}
-		for success + failure != 100000 {
-			 time.Sleep(1 * time.Second)
+		for success + failure != int32(nthread * ncount) {
+			 time.Sleep(100 * time.Millisecond)
 		}
 
 		fmt.Println("success %d, failure%d", success, failure)
@@ -74,3 +85,8 @@ func Run() {
 	}()
 }
 
+func startProfile() {
+	go func() {
+		http.ListenAndServe("0.0.0.0:8089", nil)
+	}()
+}

@@ -51,15 +51,14 @@ func (r *RestFulApi) SayGRPCHello(b *restful.Context) {
 		b.WriteHeader(http.StatusInternalServerError)
 		b.Write([]byte("Server internal error"))
 	} else {
-		logrus.Info(reply.Message)
 		b.Write([]byte(reply.Message))
 	}
 }
 
 func (s *RestFulApi) URLPatterns() []restful.Route {
 	return []restful.Route{
-		{http.MethodGet, "/sayresthello/{userid}", "SayRestHello"},
-		{http.MethodGet, "/saygrpchello/{userid}", "SayGRPCHello"},
+		{Method:http.MethodGet, Path:"/sayresthello/{userid}", ResourceFuncName:"SayRestHello"},
+		{Method:http.MethodGet, Path:"/saygrpchello/{userid}", ResourceFuncName:"SayGRPCHello"},
 	}
 }
 

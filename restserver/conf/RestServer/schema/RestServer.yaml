@@ -1,0 +1,19 @@
+swagger: "2.0"
+info:
+  title: ""
+  version: ""
+basePath: /
+paths:
+  /server/{userid}:
+    get:
+      operationId: func1
+      consumes:
+      - application/xml
+      - application/json
+      - application/octet-stream
+      - multipart/form-data
+      produces:
+      - application/json
+      - application/xml
+      - application/octet-stream
+      - multipart/form-data
